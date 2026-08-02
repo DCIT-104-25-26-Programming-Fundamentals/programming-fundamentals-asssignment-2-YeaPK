@@ -81,5 +81,119 @@
 #include <vector>
 #include <string>
 #include <iomanip>
+#include <limits>
 using namespace std;
+
+struct Student {
+    string name;
+    int id;
+    vector<double> scores;
+};
+
+static double calculateAverage(const vector<double>& scores) {
+    if (scores.empty()) {
+        return 0.0;
+    }
+    double sum = 0.0;
+    for (double score : scores) {
+        sum += score;
+    }
+    return sum / scores.size();
+}
+
+static void addStudent(vector<Student>& students) {
+    Student student;
+    cout << "Student name: ";
+    getline(cin, student.name);
+    cout << "Student ID: ";
+    cin >> student.id;
+    int numScores;
+    cout << "How many scores? ";
+    cin >> numScores;
+    student.scores.clear();
+    for (int i = 1; i <= numScores; i++) {
+        double score;
+        cout << "Enter score " << i << ": ";
+        cin >> score;
+        student.scores.push_back(score);
+    }
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    students.push_back(student);
+    cout << "Student \"" << student.name << "\" added successfully." << endl;
+}
+
+static void displayAllStudents(const vector<Student>& students) {
+    if (students.empty()) {
+        cout << "No students have been added yet." << endl;
+        return;
+    }
+
+    cout << left << setw(25) << "Name" << setw(12) << "ID" << setw(30) << "Scores" << setw(10) << "Average" << endl;
+    cout << string(77, '-') << endl;
+    for (const auto& student : students) {
+        cout << left << setw(25) << student.name << setw(12) << student.id;
+        string scoreList;
+        for (size_t i = 0; i < student.scores.size(); ++i) {
+            scoreList += to_string(student.scores[i]);
+            if (i + 1 < student.scores.size()) {
+                scoreList += ", ";
+            }
+        }
+        cout << setw(30) << scoreList;
+        cout << fixed << setprecision(2) << calculateAverage(student.scores) << endl;
+    }
+}
+
+static void calculateAverageScore(const vector<Student>& students) {
+    cout << "Enter student ID: ";
+    int id;
+    cin >> id;
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+
+    for (const auto& student : students) {
+        if (student.id == id) {
+            cout << fixed << setprecision(2);
+            cout << student.name << "'s average score: " << calculateAverage(student.scores) << endl;
+            return;
+        }
+    }
+    cout << "Student with ID " << id << " not found." << endl;
+}
+
+int main() {
+    vector<Student> students;
+    int choice;
+
+    do {
+        cout << "\n===============================\n";
+        cout << "   STUDENT RECORD SYSTEM MENU\n";
+        cout << "===============================\n";
+        cout << "1. Add student\n";
+        cout << "2. Display all students\n";
+        cout << "3. Calculate average score\n";
+        cout << "4. Quit\n";
+        cout << "Enter your choice (1-4): ";
+        cin >> choice;
+        cin.ignore(); // Clear the newline character from the input buffer
+
+        switch (choice) {
+            case 1:
+                addStudent(students);
+                break;
+            case 2:
+                displayAllStudents(students);
+                break;
+            case 3:
+                calculateAverageScore(students);
+                break;
+            case 4:
+                cout << "Goodbye!\n";
+                break;
+            default:
+                cout << "Invalid choice. Please enter a number between 1 and 4.\n";
+        }
+    } while (choice != 4);
+
+    return 0;
+}
 
